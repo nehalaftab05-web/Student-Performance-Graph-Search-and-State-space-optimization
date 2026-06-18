@@ -1,189 +1,350 @@
-# Student-Performance-Graph-Search-and-State-space-optimization
-Artificial-Intelligence
-Student Performance Graph Search & State-Space Optimization
-This repository implements an AI Agent Environment built over the UCI Student Performance Dataset (Track C: Education). The project constructs a state-space graph connecting student behavioral metrics (study time) to final academic results (
-G
-3
- grades) and systematically evaluates Uninformed, Informed, Local, and Adversarial (Game-Playing) search algorithms.
+# 🎓 Student Performance AI — End-to-End ML Pipeline
 
-📊 Dataset & State-Space Graph Architecture
-Domain Context
-The underlying dataset consists of student profiles from two Portuguese schools. It details demographic factors, social characteristics, and academic tracking markers distributed across 33 properties.
+> A complete, from-scratch implementation of classical AI and Machine Learning algorithms applied to the UCI Student Performance dataset. Covers search, constraint satisfaction, clustering, and neural networks — no sklearn ML models used.
 
-Graph Construction
-A network graph is systematically constructed by mapping features to distinct node environments:
+---
 
-Source Nodes: Operationalized behaviors, explicitly targeting study frequencies (e.g., StudyTime_2).
-Target Nodes: Final scholastic evaluations graded out of 20 points (e.g., Grade_15).
-Edges: Represent an unweighted, undirected connection (
-cost
-=
-1
-) dynamically added when a data record satisfies both the specific habit profile and the grading tier.
-[StudyTime_1] -------- (Student Records) -------- [Grade_8]
-[StudyTime_2] <=======> [Grade_15] (Target Goal)
-[StudyTime_3] -------- (Student Records) -------- [Grade_10]
+## 📋 Table of Contents
 
-Environment Characteristics
-Total Identified Nodes: 22
-Total Extracted Edges: 59
-Target State Variable: Final Assessment Score (
-G
-3
-)
-🤖 AI Agent Architecture
-The environmental agent abstracts perception and routing capabilities across the graph via the standard AIAgent interface:
+- [Project Overview](#project-overview)
+- [Dataset](#dataset)
+- [Project Structure](#project-structure)
+- [Phase Breakdown](#phase-breakdown)
+  - [Phase 1 — Data Exploration & Graph Construction](#phase-1--data-exploration--graph-construction)
+  - [Phase 2 — Search Algorithms & Adversarial AI](#phase-2--search-algorithms--adversarial-ai)
+  - [Phase 3 — Constraint Satisfaction Problem (CSP)](#phase-3--constraint-satisfaction-problem-csp)
+  - [Phase 4 — Machine Learning Pipeline](#phase-4--machine-learning-pipeline)
+- [Results Summary](#results-summary)
+- [Setup & Installation](#setup--installation)
+- [Usage](#usage)
+- [Key Design Decisions](#key-design-decisions)
+- [Dependencies](#dependencies)
 
-perceive(state): Probes the environment topology to return accessible neighbors.
-act(action): Transitions the internal state machine to the targeted node.
-goal_test(state): Verifies if the agent has reached the target grade node (e.g., Grade_15).
-get_cost(state1, state2): Enforces an isotropic uniform movement step cost of 
-1
-.
-🔍 Evaluated Search Frameworks
-1. Uninformed Search (Blind Routings)
-Implements baseline traversal logic through structured memory spaces without structural optimization heuristics:
+---
 
-Breadth-First Search (BFS): FIFO implementation exploring frontier nodes uniformly. Finds the optimal path with shallowest-node evaluation constraints.
-Depth-First Search (DFS): LIFO stack deployment maximizing branch traversal before backtracking. Minimizes memory footprints under favorable path selections.
-Depth-Limited Search (DLS): DFS variation bounded by a hard depth maximum to mitigate structural trapping inside infinite loop spaces.
-Iterative Deepening Search (IDS): Iteratively expands DLS boundary thresholds. Combines the completeness of BFS with the space efficiency of DFS.
-Uniform Cost Search (UCS): Dijkstra-variant priority queue routing that expands along paths minimizing cumulative operational costs 
-g
-(
-n
-)
-.
-2. Informed Search (Heuristic Routings)
-Utilizes an admissible evaluation function 
-h
-(
-n
-)
- to estimate remaining path costs to the target:
+## Project Overview
 
-Admissible 
-h
-(
-n
-)
-=
-{
-0
-if 
-n
-=
-Goal
- 
-1
-if 
-n
-∈
-StudyTime
- 
-2
-if 
-n
-∈
-Alternative Grade
+This project implements a full AI pipeline on the UCI Student Performance dataset. Every core algorithm — from BFS to backpropagation — is written **from scratch in pure Python/NumPy** to demonstrate fundamental understanding, with `sklearn` used only for preprocessing utilities.
 
-Greedy Best-First Search: Evaluates paths strictly using the structural heuristic estimation 
-h
-(
-n
-)
-, minimizing immediate expansion trajectories.
-A Search:* Minimizes total estimated path function costs 
-f
-(
-n
-)
-=
-g
-(
-n
-)
-+
-h
-(
-n
-)
-, guaranteeing an optimal path trajectory.
-3. Local Search & Optimization (Heuristics Optimization)
-Formulates traversal around maximizing state-objective performance scores rather than preserving complete historical paths:
+**Target Variable:** `G3` — final student grade (0–20 scale, 18 unique classes)
 
-Hill Climbing: Greedily moves towards neighboring states that maximize structural performance value. It can get trapped at local optima depending on initial graph configurations.
-Simulated Annealing: Employs a physical thermodynamic cooling function (
-T
-0
-=
-100
-,
-α
-=
-0.95
-). It systematically permits down-slope exploratory transitions to avoid tracking traps:
-P
-(
-accept
-)
-=
-e
-Δ
-E
-T
+**Core Problem:** Can a student's behavioral attributes (study time, absences, family support) predict their final academic grade?
 
-Local Beam Search: Evaluates 
-k
- parallel paths concurrently (
-k
-∈
-3
-,
-5
-), consolidating data tracks around top-performing nodes.
-4. Adversarial Game Search
-Models academic prediction tracking as an alternating two-player game tree to evaluate state values under adversarial conditions:
+---
 
-Minimax Search: Recursively computes optimal policy values by modeling alternating maximizing adjustments (representing optimal study trajectories) against minimizing adjustments (representing resource constraints or behavioral regressions).
-📈 Performance Benchmarks
-Uninformed vs. Informed Efficiency
-The experimental run logs demonstrate a clear decrease in node exploration overhead when utilizing informed search methods:
+## Dataset
 
-Algorithm Standard	Path Length	Explored Node Cardinality	Optimization Target
-BFS	1	18	Shortest Path
-DFS	1	2	Deep Branch
-UCS	1	8	Cheapest Evaluation
-Greedy Best-First	1	2	Heuristic Guided
-A*	1	2	Optimal 
-g
-(
-n
-)
-+
-h
-(
-n
-)
-Local Search Optimization Results
-Hill Climbing: 100% success rate across 10 random initialization passes due to the interconnected nature of the study-grade graph.
-Simulated Annealing: Reached the global maximum on all evaluation iterations.
-Local Beam Search: Successfully found the global target state across both test parameters (
-k
-=
-3
- and 
-k
-=
-5
-).
-🛠️ Project Structure & Setup
-Environment Dependencies
-The analytical execution workspace relies on standard scientific Python libraries:
+**Source:** [UCI Machine Learning Repository — Student Performance](https://archive.ics.uci.edu/ml/datasets/student+performance)
 
+| Property | Value |
+|---|---|
+| File | `track_c_education/student_data.csv` |
+| Rows | 395 students |
+| Columns | 33 features |
+| Missing Values | None |
+| Target Column | `G3` (final grade, 0–20) |
+| Notable Features | `studytime`, `absences`, `failures`, `Medu`, `Fedu`, `health`, `G1`, `G2` |
+
+**Class Distribution (G3):** Heavily concentrated between grades 8–15, with 38 students scoring 0 (likely dropouts) and only 1 scoring 20.
+
+---
+
+## Project Structure
+
+```
+student-performance-ai/
+│
+├── track_c_education/
+│   └── student_data.csv          # Raw dataset
+│
+├── notebook.ipynb                # Main Jupyter Notebook (all phases)
+│
+└── README.md
+```
+
+---
+
+## Phase Breakdown
+
+### Phase 1 — Data Exploration & Graph Construction
+
+**Goal:** Understand the dataset and model relationships as a graph.
+
+**Steps:**
+- Loaded and inspected dataset shape, dtypes, and missing values
+- Computed class distribution of target variable `G3` using a manual dictionary loop (no `value_counts`)
+- Defined a `DataRecord` class encapsulating `record_id`, `features`, and `label`
+- Built a **bipartite graph** mapping `StudyTime_X` ↔ `Grade_Y` nodes from dataset rows
+
+**Graph Stats:**
+
+| Property | Value |
+|---|---|
+| Nodes | 22 (4 StudyTime + 18 Grade) |
+| Edges | 59 unique undirected edges |
+| Representation | Adjacency list (`dict` of `list`) |
+
+**Design Note:** `StudyTime` and `Grade` nodes were prefixed with string labels to avoid integer key collisions in the dictionary.
+
+---
+
+### Phase 2 — Search Algorithms & Adversarial AI
+
+**State Space:**
+- **Initial State:** A study habit node (e.g., `StudyTime_2`)
+- **Goal State:** A target grade node (e.g., `Grade_15`)
+- **Actions:** Traverse edges in the graph
+- **Cost:** Uniform (1 per edge)
+
+#### Uninformed Search
+
+| Algorithm | Path Length | Nodes Explored |
+|---|---|---|
+| BFS | 1 | 18 |
+| DFS | 1 | 2 |
+| DLS (limit=3) | 1 | 2 |
+| DLS (limit=5) | 1 | 2 |
+| IDS (depth=1) | 1 | 3 |
+| UCS | 1 | 8 |
+
+> All paths are length 1 because `StudyTime_2` directly connects to `Grade_15` in the graph.
+
+#### Informed Search
+
+**Heuristic Design (Admissible):**
+- `h(goal) = 0`
+- `h(StudyTime node) = 1` — one hop to any grade
+- `h(Grade node, not goal) = 2` — must backtrack through a study habit
+
+| Algorithm | Path Length | Nodes Explored |
+|---|---|---|
+| Best-First (Greedy) | 1 | 2 |
+| A\* | 1 | 2 |
+| UCS (baseline) | 1 | 8 |
+
+#### Local Search
+
+| Algorithm | Goal Reached (10 runs) |
+|---|---|
+| Hill Climbing | 10/10 |
+| Simulated Annealing | 10/10 |
+| Local Beam Search (k=3) | ✅ Found `Grade_15` |
+| Local Beam Search (k=5) | ✅ Found `Grade_15` |
+
+#### Adversarial Search (Minimax vs Alpha-Beta)
+
+Starting from `StudyTime_2`, depth limit = 4, goal = `Grade_15`:
+
+| Algorithm | Nodes Evaluated |
+|---|---|
+| Standard Minimax | 3,540 |
+| Alpha-Beta Pruning | 616 |
+| **Nodes Eliminated** | **2,924 (82.6% reduction)** |
+
+---
+
+### Phase 3 — Constraint Satisfaction Problem (CSP)
+
+**Problem:** Define a "High-Performing Student Profile" (G3 ≥ 15).
+
+**Variables & Domains:**
+
+| Variable | Domain |
+|---|---|
+| `StudyTime` | {1, 2, 3, 4} |
+| `Absences` | {Low, Medium, High} |
+| `Health` | {1, 2, 3, 4, 5} |
+| `Activities` | {yes, no} |
+| `FamSup` | {yes, no} |
+
+**Constraints:**
+
+| Rule | Description |
+|---|---|
+| R1 | `StudyTime == 1` → `Absences != High` |
+| R2 | `Activities == yes` → `Health >= 3` |
+| R3 | `FamSup == no` → `StudyTime >= 3` |
+| R4 | `StudyTime + Health >= 4` |
+| R5 | `Absences == High` → `Activities == no` |
+
+#### AC-3 Arc Consistency
+
+AC-3 ran successfully without eliminating any values — indicating that no single-variable domain reduction was possible from binary constraints alone; solutions exist across the full domain space.
+
+#### Backtracking Comparison
+
+| Variant | Solution Found | Backtracks |
+|---|---|---|
+| Basic Backtracking | `{StudyTime:1, Absences:Low, FamSup:yes, Activities:yes, Health:3}` | 0 |
+| Forward Checking | `{StudyTime:1, Absences:Low, FamSup:yes, Activities:yes, Health:3}` | 0 |
+| MRV Heuristic | `{FamSup:yes, Activities:yes, Absences:Low, Health:3, StudyTime:1}` | 0 |
+
+> All variants found a valid solution immediately. MRV reorders assignment by most-constrained variable first.
+
+#### Min-Conflicts
+
+Converged in **0 iterations** — the random initial assignment happened to violate no constraints, demonstrating that valid assignments are dense in this CSP's solution space.
+
+---
+
+### Phase 4 — Machine Learning Pipeline
+
+#### Preprocessing
+
+- Missing values: filled with column mean (numeric) / mode (categorical)
+- Categorical encoding: `LabelEncoder` on all `object` columns
+- Normalization: Z-score standardization on all numeric features except `G3`
+- `G1` and `G2` dropped to force the model to learn from behavioral features only
+- Train/test split: **80/20**, `random_state=42`
+
+| Split | Shape |
+|---|---|
+| `X_train` | (316, 30) |
+| `X_test` | (79, 30) |
+
+#### Unsupervised — K-Means & K-Medoids (From Scratch)
+
+`k = 18` (matching unique grade classes)
+
+| Algorithm | Convergence | WCSD |
+|---|---|---|
+| K-Means | Iteration 9 | 1068.12 |
+| K-Medoids | Iteration 3 | 1246.05 |
+
+**Cluster Purity:** 16–50% per cluster. Low purity is expected — students with identical habits can earn very different grades.
+
+#### Supervised — Perceptron (From Scratch)
+
+- **Task:** Binary classification (Pass: G3 ≥ 10 / Fail: G3 < 10)
+- **Learning Rate:** 0.01 | **Epochs:** 50
+- **Final Training Accuracy:** ~60.76%
+- **Observation:** Dataset is not linearly separable; perceptron cannot converge perfectly.
+
+#### Supervised — Delta Rule / Batch Gradient Descent (From Scratch)
+
+- **Task:** Regression on continuous G3 values
+- **Learning Rate:** 0.01 | **Epochs:** 100
+- **Final MSE:** 19.3350
+- **Update Rule:** Averaged gradients across all samples per epoch (true batch GD)
+
+#### Supervised — Multilayer Perceptron (From Scratch)
+
+**Architecture:** `30 → 16 → 8 → 18`
+
+| Layer | Size | Activation |
+|---|---|---|
+| Input | 30 | — |
+| Hidden 1 | 16 | ReLU |
+| Hidden 2 | 8 | ReLU |
+| Output | 18 | Softmax |
+
+**Training:** Cross-Entropy Loss, backpropagation with chain rule, SGD updates
+
+| Epoch | Loss | Accuracy |
+|---|---|---|
+| 0 | 2.8879 | 7.28% |
+| 100 | 2.6979 | 14.24% |
+| 199 | 2.5754 | 17.72% |
+
+> Loss decreases consistently. Accuracy is low due to 18-class difficulty with behavioral-only features (G1/G2 excluded).
+
+---
+
+## Results Summary
+
+| Component | Method | Key Result |
+|---|---|---|
+| Uninformed Search | BFS | Finds goal in 1 hop, 18 nodes explored |
+| Informed Search | A\* | Finds goal in 1 hop, 2 nodes explored |
+| Adversarial AI | Alpha-Beta | 82.6% node reduction vs Minimax |
+| CSP Solving | MRV + FC | 0 backtracks needed |
+| Clustering | K-Means | WCSD 1068.12, converged iteration 9 |
+| Binary Classification | Perceptron | ~60.76% accuracy (non-separable data) |
+| Regression | Delta Rule | MSE 19.34 after 100 epochs |
+| Multi-class NN | MLP (30→16→8→18) | 17.72% accuracy, loss 2.575 |
+
+---
+
+## Setup & Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/naynay575/student-performance-ai.git
+cd student-performance-ai
+
+# Create a virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate        # Linux/macOS
+venv\Scripts\activate           # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Launch the notebook
+jupyter notebook notebook.ipynb
+```
+
+---
+
+## Usage
+
+All code is self-contained in a single Jupyter Notebook organized by phase. Run cells sequentially — each phase depends on variables defined in previous ones.
+
+```
+Phase 1  →  Phase 2  →  Phase 3  →  Phase 4
+(Data)      (Search)     (CSP)       (ML)
+```
+
+To change the **goal state** for search algorithms, update:
+
+```python
+target_grade = "Grade_15"   # Change to any Grade_0 through Grade_20
+agent = AIAgent(graph=graph, goal_state=target_grade)
+```
+
+To change the **start state** for searches:
+
+```python
+initial_state = "StudyTime_2"  # Options: StudyTime_1, _2, _3, _4
+```
+
+---
+
+## Key Design Decisions
+
+**Graph as bipartite structure** — Connecting `StudyTime` and `Grade` nodes via student rows creates a simple, interpretable state space without needing weighted edges.
+
+**G1/G2 dropped intentionally** — These intermediate grades are near-perfect predictors of G3, making the ML task trivial. Dropping them forces models to learn from behavioral features, which is the actual research question.
+
+**k=18 for clustering** — Matching the number of unique grade values ensures one-to-one comparison with true labels when computing cluster purity.
+
+**ReLU over Sigmoid in MLP** — ReLU avoids the vanishing gradient problem that would slow learning in a 3-layer network trained on a small dataset.
+
+**Softmax + Cross-Entropy shortcut** — The combined derivative simplifies to `A3 - Y_one_hot`, which was used in backpropagation for numerical stability and implementation correctness.
+
+---
+
+## Dependencies
+
+```
+numpy>=1.24.0
+pandas>=2.0.0
+matplotlib>=3.7.0
+scikit-learn>=1.3.0
+```
+
+```bash
 pip install numpy pandas matplotlib scikit-learn
-Core Pipeline Execution
-Ingestion: Reads student profiles from track_c_education/student_data.csv.
-Profiling: Validates dataset shapes, column properties, and handles any missing values using pd.DataFrame utilities.
-Graph Generation: Extracts feature cross-connections and maps them into an adjacency list dictionary structure.
-Simulation Execution: Iterates through the search algorithms to benchmark graph traversals, route metrics, and exploration costs.
+```
+
+> No external AI/ML libraries were used for algorithm implementation. `sklearn` is used exclusively for `LabelEncoder`, `train_test_split`, and dataset loading utilities.
+
+---
+
+## Author
+
+**Nehal Aftab** — CS Student, FAST-NUCES Faisalabad (Batch 2024–2028)
+
+[![GitHub](https://img.shields.io/badge/GitHub-naynay575-181717?logo=github)](https://github.com/naynay575)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-nehal--aftab-0A66C2?logo=linkedin)](https://linkedin.com/in/nehal-aftab)
+[![Email](https://img.shields.io/badge/Email-nehal.aftab05%40gmail.com-D14836?logo=gmail)](mailto:nehal.aftab05@gmail.com)
